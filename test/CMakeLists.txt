@@ -1,26 +1,7 @@
 # //==========================\\
 # || Google Testing Framework ||
 # \\==========================//
-include(ExternalProject)
-
-# Add the GTest framework as an external project
-set_directory_properties(PROPERTIES
-  EP_PREFIX ${CMAKE_BINARY_DIR}/ThirdParty)
-ExternalProject_Add(
-  googletest
-  GIT_REPOSITORY http://github.com/google/googletest
-  GIT_TAG release-1.8.0
-  TIMEOUT 10
-  CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-             -Dgtest_force_shared_crt=ON
-  INSTALL_COMMAND ""
-  UPDATE_COMMAND ""
-  LOG_DOWNLOAD ON
-  LOG_CONFIGURE ON
-  LOG_BUILD ON)
-
-set_target_properties(googletest PROPERTIES EXCLUDE_FROM_ALL TRUE)
-ExternalProject_Get_Property(googletest binary_dir)
+include(gtest)
 
 # Use the proper library suffix for the current environment
 if(MSVC)
@@ -35,7 +16,7 @@ if(APPLE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -U__STRING_ANSI__")
 endif()
 
-# Include the GTest framework files in the compilation include path
+# Include the GTest framework files
 ExternalProject_Get_Property(googletest source_dir)
 include_directories(${source_dir}/include)
 
@@ -48,7 +29,7 @@ set(GTEST_TARGET ${PROJECT_NAME}-test)
 add_executable(${GTEST_TARGET}
     EXCLUDE_FROM_ALL ${TEST_FILES})
 add_dependencies(${GTEST_TARGET}
-    googletest
+    ${GTEST_LIBRARY}
     ${PROJECT_NAME}-lib)
 target_link_libraries(${GTEST_TARGET}
     ${PROJECT_NAME}-lib
@@ -62,8 +43,10 @@ if(CMAKE_COMPILER_IS_GNUC OR CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 # Add a custom target to automatically run all tests
+SET(ENV{GTEST_OUTPUT} "xml:${CMAKE_BINARY_DIR}/test.xml")
 add_custom_target(check
-    COMMAND ${EXECUTABLE_OUTPUT_PATH}/${GTEST_TARGET} --gtest-output="xml:${CMAKE_BINARY_DIR}/tests.xml" || true)
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMAND ./${GTEST_TARGET} || true)
 add_dependencies(check ${GTEST_TARGET})
 
 if(COVERAGE_ENABLED)
