@@ -57,10 +57,10 @@ CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 if(COMPILER_SUPPORTS_CXX11)
   # Use -std++11 if it's supported
-  set(CMAKE_CXX_FLAGS "#{CMAKE_CXX_FLAGS} -std=c++11")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 elseif(COMPILER_SUPPORTS_CXX0X)
   # Otherwise, fall back to -std=c++0x
-  set(CMAKE_CXX_FLAGS "#{CMAKE_CXX_FLAGS} -std=c++0x")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 else()
   # Otherwise, fail to compile
   message(FATAL_ERROR "Compiler does not support C++11")
@@ -70,13 +70,13 @@ if(DEBUG_ENABLED)
   # Disable optimization and enable debugging information if debugging is
   # enabled.
   set(CMAKE_CXX_FLAGS
-      "#{CMAKE_CXX_FLAGS} -O0 -g")
+      "${CMAKE_CXX_FLAGS} -O0 -g")
 endif()
 
 if(COVERAGE_ENABLED)
   # Set extra coverage-related flags if coverage is enabled.
   set(CMAKE_CXX_FLAGS
-      "#{CMAKE_CXX_FLAGS} -fPIC -fprofile-arcs -ftest-coverage")
+      "${CMAKE_CXX_FLAGS} -fPIC -fprofile-arcs -ftest-coverage")
 endif()
 
 # //==========================\\
